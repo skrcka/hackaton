@@ -5,7 +5,7 @@ export default class WhacAMole extends Phaser.Scene
     music: Phaser.Sound.BaseSound | null;
     music_damage: Phaser.Sound.BaseSound | null;
 
-    map: Phaser.Tilemaps.Tilemap | null;
+    //map: Phaser.Tilemaps.Tilemap | null;
     backgroundLayer: Phaser.Tilemaps.TilemapLayer | null;
     collisionLayer: Phaser.Tilemaps.TilemapLayer | null;
     
@@ -20,7 +20,7 @@ export default class WhacAMole extends Phaser.Scene
 		super('hello-world');
         this.music=null;
         this.music_damage=null;
-        this.map=null;
+        //this.map=null;
         this.backgroundLayer=null;
         this.collisionLayer=null;
         this.hammer=null;
@@ -44,8 +44,8 @@ export default class WhacAMole extends Phaser.Scene
         //this.load.tilemapTiledJSON('json_map', 'assets/DanMap.json');
 
         //AUDIO
-        this.load.audio('bgMusic','../../assets/song.mp3');
-        this.load.audio('damage','../../assets/kill.mp3');
+        this.load.audio('bgMusic','assets/song.mp3');
+        this.load.audio('damage','assets/kill.mp3');
     }
 
     resize(width, height){
@@ -70,23 +70,24 @@ export default class WhacAMole extends Phaser.Scene
     this.music.play();
 
   
-    this.map = this.make.tilemap({ key: 'json_map' });//json map 
+    //this.map = this.make.tilemap({ key: 'json_map' });//json map 
     //F: 'map_tiles' - name of the tilesets in json_map.json
     //F: 'tiles' - name of the image in load.images()
-    let tiles = this.map?.addTilesetImage('map_tilesw', 'tiles');
+    //let tiles = this.map?.addTilesetImage('map_tilesw', 'tiles');
+    this.add.image(400, 300, 'map_tilesw');
 
-    this.backgroundLayer = new Phaser.Tilemaps.TilemapLayer(this, this.map, 0, tiles)
-    this.collisionLayer = new Phaser.Tilemaps.TilemapLayer(this, this.map, 1, tiles)
-    this.collisionLayer.setCollisionByExclusion([ -1 ]);
+    //this.collisionLayer = this.map.createLayer('collision', tiles);
+    //this.backgroundLayer = this.map.createLayer('background', tiles).setVisible(true);
+    //this.collisionLayer.setCollisionByExclusion([ -1 ]);
     
     //items = this.physics.add.sprite(100, 150, 'items', 0);
     //items.setBounce(0.1);
     
     this.hammer = this.physics.add.sprite(100, 450, 'hammer');
-    this.physics.add.overlap(this.hammer, this.backgroundLayer);
+    //this.physics.add.overlap(this.hammer, this.backgroundLayer);
     
     //F:set collision range 
-    this.backgroundLayer.setCollisionBetween(1, 25);    
+    //this.backgroundLayer.setCollisionBetween(1, 25);    
        
     /*
     text = this.add.text(game.canvas.width/2, 16, '', {
