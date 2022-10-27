@@ -1,18 +1,22 @@
 import Phaser from 'phaser'
 
-import HelloWorldScene from './scenes/HelloWorldScene'
+import WhacAMole from './scenes/WhacAMole'
 
 const config = {
 	type: Phaser.AUTO,
-	width: 800,
-	height: 600,
-	physics: {
-		default: 'arcade',
-		arcade: {
-			gravity: { y: 200 }
-		}
-	},
-	scene: [HelloWorldScene]
+    parent: 'phaser-app',
+    scale: {
+        mode: Phaser.Scale.FIT,
+    },
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 0 },
+            debug: false
+        }
+    },
+    debug: true,
+	scene: [WhacAMole]
 }
 
 export default new Phaser.Game(config)
