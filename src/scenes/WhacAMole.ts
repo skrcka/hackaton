@@ -5,10 +5,9 @@ export default class WhacAMole extends Phaser.Scene
     music: Phaser.Sound.BaseSound | null;
     music_damage: Phaser.Sound.BaseSound | null;
 
-    //map: Phaser.Tilemaps.Tilemap | null;
+    map: Phaser.Tilemaps.Tilemap | null;
     backgroundLayer: Phaser.Tilemaps.TilemapLayer | null;
-    collisionLayer: Phaser.Tilemaps.TilemapLayer | null;
-    
+
     hammer: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | null;
 
     tick: number;
@@ -18,13 +17,17 @@ export default class WhacAMole extends Phaser.Scene
 	constructor()
 	{
 		super('hello-world');
+
         this.music=null;
         this.music_damage=null;
-        //this.map=null;
+
+        this.map = null;
         this.backgroundLayer=null;
-        this.collisionLayer=null;
+
         this.hammer=null;
+
         this.tick = 0;
+
         this.enemies = [];
 	}
 
@@ -36,14 +39,9 @@ export default class WhacAMole extends Phaser.Scene
         this.load.spritesheet('items', 'assets/items.png', { frameWidth: 32, frameHeight: 32 } ); 
         this.load.spritesheet('hammer', 'assets/hammer.png', { frameWidth: 32, frameHeight: 32 } ); 
 
-        this.load.image('tiles', 'assets/map_tilesw.png');
+        this.load.image('tiles', 'assets/map_tilesew.png');
         this.load.tilemapTiledJSON('json_map', 'assets/json_map.json');
         
-        //this.load.image('tiles', 'assets/img64.png');
-        //this.load.image('tiles', 'assets/MapTiltes.png');
-        //this.load.tilemapTiledJSON('json_map', 'assets/DanMap.json');
-
-        //AUDIO
         this.load.audio('bgMusic','assets/song.mp3');
         this.load.audio('damage','assets/kill.mp3');
     }
@@ -70,18 +68,12 @@ export default class WhacAMole extends Phaser.Scene
     this.music.play();
 
   
-    //this.map = this.make.tilemap({ key: 'json_map' });//json map 
-    //F: 'map_tiles' - name of the tilesets in json_map.json
-    //F: 'tiles' - name of the image in load.images()
-    //let tiles = this.map?.addTilesetImage('map_tilesw', 'tiles');
-    this.add.image(400, 300, 'map_tilesw');
+    //this.add.image(400, 300, 'map_tilesw');
+    this.map = this.make.tilemap({ key: 'json_map' });//json map 
+    let tiles = this.map.addTilesetImage('map_tilesew','tiles');
+    console.log(tiles);
 
-    //this.collisionLayer = this.map.createLayer('collision', tiles);
-    //this.backgroundLayer = this.map.createLayer('background', tiles).setVisible(true);
-    //this.collisionLayer.setCollisionByExclusion([ -1 ]);
-    
-    //items = this.physics.add.sprite(100, 150, 'items', 0);
-    //items.setBounce(0.1);
+    this.backgroundLayer = this.map.createLayer('background', tiles);
     
     this.hammer = this.physics.add.sprite(100, 450, 'hammer');
     //this.physics.add.overlap(this.hammer, this.backgroundLayer);
@@ -130,12 +122,11 @@ export default class WhacAMole extends Phaser.Scene
             let enemy = this.physics.add.sprite(x, y, 'robot');
             enemy.setBounce(0.1);
             this.enemies.push(enemy);
-            if(this.collisionLayer && this.backgroundLayer){
-                this.physics.add.collider(enemy, this.collisionLayer);
-                this.physics.add.overlap(enemy, this.backgroundLayer);
-                if(this.hammer)
-                    this.physics.add.overlap(this.hammer, enemy, () => { this.collisionHandlerEnemy(enemy) });
-            }
+            //if(this.collisionLayer && this.backgroundLayer){
+            //this.physics.add.collider(enemy, this.collisionLayer);
+            //this.physics.add.overlap(enemy, this.backgroundLayer);
+            if(this.hammer)
+                this.physics.add.overlap(this.hammer, enemy, () => { this.collisionHandlerEnemy(enemy) });
         }
     }
 
