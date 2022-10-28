@@ -1,0 +1,37 @@
+name: Update And Deploy
+on:
+  workflow_dispatch:
+  schedule:
+    - cron:  '0 0 1,15 * *'
+jobs:
+  build_test_and_push_images:
+    name: Build Docker image test and deploy to DockerHub (latest, with chrome version)
+    runs-on: ubuntu-latest
+    env: 
+      DOCKER_USER: ${{ secrets.DOCKER_USER }}
+      DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+      - name: Login to DockerHub
+        run: docker login -u $DOCKER_USER -p $DOCKER_PASS
+      - name: Build docker image
+        run: docker build -q -t profiq/node-java-chrome-ff .
+      - name: Start docker image
+        run: docker run -itd --name node-java-chrome-ff profiq/node-java-chrome-ff
+      - name: Run tests
+        run: docker exec node-java-chrome-ff ./tests.sh
+      - name: Get latest chrome version
+        run: export CHROME_VERSION=$(docker exec node-java-chrome-ff google-chrome --version 2>&1 | head -1 | cut -d'"' -f2 | sed '/^1\./s///' | cut -d'.' -f1 | sed '/Google Chrome /s///')
+      - name: Tag with chrome version
+        run: docker tag profiq/node-java-chrome-ff profiq/node-java-chrome-ff:chrome-$CHROME_VERSION
+      - name: Get latest firefox version
+        run: export FIREFOX_VERSION=$(firefox --version 2>&1 | head -1 | cut -d'"' -f2 | sed '/^1\./s///' | cut -d'.' -f1 | sed '/Mozilla Firefox /s///')
+      - name: Tag with firefox version
+        run: docker tag profiq/node-java-chrome-ff profiq/node-java-chrome-ff:firefox-$FIREFOX_VERSION
+      - name: Tag with chrome and firefox version
+        run: docker tag profiq/node-java-chrome-ff profiq/node-java-chrome-ff:ch$CHROME_VERSION-ff$FIREFOX_VERSION
+      - name: Tag with latest
+        run: docker tag profiq/node-java-chrome-ff profiq/node-java-chrome-ff:latest
+      - name: Push to DockerHub
+        run: docker push profiq/node-java-chrome-ff --all-tags
