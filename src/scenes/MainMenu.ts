@@ -37,6 +37,8 @@ export default class Menu extends Phaser.Scene
 
         this.load.image('tiles', 'assets/map_tilesew.png');
         this.load.tilemapTiledJSON('json_map', 'assets/json_map.json');
+        this.load.tilemapTiledJSON('json_mapWater', 'assets/json_mapWater.json');
+        //this.load.tilemapTiledJSON('json_mapFire', 'assets/json_mapFire.json');
         
         this.load.audio('bgMusic','assets/song.mp3');
         this.load.audio('damage','assets/kill.mp3');
@@ -129,7 +131,7 @@ export default class Menu extends Phaser.Scene
                     this.hold1 = 0;
                     setTimeout(()=>{
                         this.playButton1?.destroy(true);
-                        this.scene.start('whacamole'); // , {maptype: 'default'}
+                        this.scene.start('whacamole', {mapType: 'default'}); // , {maptype: 'default'}
                     },1300);
                 });
 
@@ -141,7 +143,7 @@ export default class Menu extends Phaser.Scene
                     this.hold2 = 0;
                     setTimeout(()=>{
                         this.playButton2?.destroy(true);
-                        this.scene.start('whacamole');
+                        this.scene.start('whacamole', {mapType: 'water'});
                     },1300);
                 });
         

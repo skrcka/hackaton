@@ -39,9 +39,12 @@ export default class WhacAMole extends Phaser.Scene
     started: boolean;
     hold: number;
 
+    mapType: string;
+
 	constructor()
 	{
 		super('whacamole');
+        this.mapType='default';
 
         this.music=null;
         this.music_damage=null;
@@ -72,6 +75,11 @@ export default class WhacAMole extends Phaser.Scene
         this.started = false;
         this.hold=100;
 	}
+
+    init(data)
+    {
+        this.mapType=data.mapType;
+    }
 
 	preload()
     {
@@ -147,7 +155,10 @@ export default class WhacAMole extends Phaser.Scene
     });
   
     //this.add.image(400, 300, 'map_tilesw');
-    this.map = this.make.tilemap({ key: 'json_map' });//json map 
+    let key = 'json_map';
+    if(this.mapType == 'water')
+        key = 'json_mapWater'
+    this.map = this.make.tilemap({ key: key });//json map 
     let tiles = this.map.addTilesetImage('map_tilesew','tiles');
 
     this.backgroundLayer = this.map.createLayer('background', tiles);
