@@ -8,9 +8,11 @@ export default class Menu extends Phaser.Scene
     
     playButton1: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | null;
     playButton2: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | null;
+    playButton3: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | null;
 
     hold1: number;
     hold2: number;
+    hold3: number;
 
 	constructor()
 	{
@@ -20,8 +22,10 @@ export default class Menu extends Phaser.Scene
         this.text=null;
         this.playButton1=null;
         this.playButton2=null;
+        this.playButton3=null;
         this.hold1=100;
         this.hold2=100;
+        this.hold3=100;
 	}
 
 	preload()
@@ -29,6 +33,8 @@ export default class Menu extends Phaser.Scene
         this.load.spritesheet('krtek', 'assets/Krtek_final.png',
             { frameWidth: 64, frameHeight: 71} );
         this.load.spritesheet('potapec', 'assets/potapec.png',
+            { frameWidth: 64, frameHeight: 71} );
+        this.load.spritesheet('zimni', 'assets/zimni.png',
             { frameWidth: 64, frameHeight: 71} );
             
         this.load.spritesheet('items', 'assets/items.png', { frameWidth: 32, frameHeight: 32 } ); 
@@ -38,7 +44,7 @@ export default class Menu extends Phaser.Scene
         this.load.image('tiles', 'assets/map_tilesew.png');
         this.load.tilemapTiledJSON('json_map', 'assets/json_map.json');
         this.load.tilemapTiledJSON('json_mapWater', 'assets/json_mapWater.json');
-        //this.load.tilemapTiledJSON('json_mapFire', 'assets/json_mapFire.json');
+        this.load.tilemapTiledJSON('json_mapLava', 'assets/json_mapLava.json');
         
         this.load.audio('bgMusic','assets/song.mp3');
         this.load.audio('damage','assets/kill.mp3');
@@ -101,10 +107,31 @@ export default class Menu extends Phaser.Scene
             frameRate: 10,
             repeat:0
         });
+
+        this.anims.create({
+            key: 'zimniup',
+            frames: this.anims.generateFrameNumbers('zimni', {start: 0, end: 12 }),
+            frameRate: 10,
+            repeat:0
+        });
+        this.anims.create({
+            key: 'zimnidown',
+            frames: this.anims.generateFrameNumbers('zimni', {start: 12, end: 0 }),
+            frameRate: 10,
+            repeat:0
+        });
+        
+        this.anims.create({
+            key: 'zimnikill',
+            frames: this.anims.generateFrameNumbers('zimni', {start: 13, end: 26 }),
+            frameRate: 10,
+            repeat:0
+        });
         
         const { width, height } = this.scale;
-        this.playButton1 = this.physics.add.sprite(width * 0.25, height * 0.7, 'krtek').setScale(4);
-        this.playButton2 = this.physics.add.sprite(width * 0.75, height * 0.7, 'potapec').setScale(4);
+        this.playButton1 = this.physics.add.sprite(width * 0.2, height * 0.7, 'krtek').setScale(4);
+        this.playButton2 = this.physics.add.sprite(width * 0.5, height * 0.7, 'potapec').setScale(4);
+        this.playButton3 = this.physics.add.sprite(width * 0.7, height * 0.7, 'zimni').setScale(4);
 
         this.text = this.add.text(100, 16, '', {
             fontSize: '55',
@@ -120,6 +147,7 @@ export default class Menu extends Phaser.Scene
 
         this.playButton1.anims.play('krtekup', true);
         this.playButton2.anims.play('potapecup', true);
+        this.playButton3.anims.play('zimniup', true);
 
         this.hammer = this.physics.add.sprite(100, 450, 'hammerAn');
         
@@ -146,6 +174,18 @@ export default class Menu extends Phaser.Scene
                         this.scene.start('whacamole', {mapType: 'water'});
                     },1300);
                 });
+
+            if(this.hammer && this.playButton3)
+                this.physics.add.overlap(this.hammer, this.playButton3, () => { 
+                    this.hold3--;
+                    this.playButton3?.anims.setProgress(this.hold3/100);
+                    if(this.hold3<=20)
+                        this.hold3 = 0;
+                        setTimeout(()=>{
+                            this.playButton3?.destroy(true);
+                            this.scene.start('whacamole', {mapType: 'zimni'});
+                        },1300);
+                    });
         
         this.input.on('pointermove', (p) => { this.pointer_move(p); });
     }

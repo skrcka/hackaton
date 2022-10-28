@@ -20,6 +20,7 @@ export default class WhacAMole extends Phaser.Scene
     backgroundLayer: Phaser.Tilemaps.TilemapLayer | null;
     collisionLayer: Phaser.Tilemaps.TilemapLayer | null;
     waterLayer: Phaser.Tilemaps.TilemapLayer | null;
+    antarktidaLayer: Phaser.Tilemaps.TilemapLayer | null;
 
     hammer: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | null;
 
@@ -57,6 +58,7 @@ export default class WhacAMole extends Phaser.Scene
         this.backgroundLayer=null;
         this.collisionLayer=null;
         this.waterLayer=null;
+        this.antarktidaLayer=null;
 
         this.hammer=null;
 
@@ -85,7 +87,7 @@ export default class WhacAMole extends Phaser.Scene
     {
     }
 
-    resize(width, height){
+    resize(width: number, height: number){
         this.scale.displaySize.setAspectRatio(width/height);
         this.scale.refresh();
     }
@@ -153,17 +155,40 @@ export default class WhacAMole extends Phaser.Scene
         frameRate: 10,
         repeat:0
     });
+
+    this.anims.create({
+        key: 'zimniup',
+        frames: this.anims.generateFrameNumbers('zimni', {start: 0, end: 12 }),
+        frameRate: 10,
+        repeat:0
+    });
+    this.anims.create({
+        key: 'zimnidown',
+        frames: this.anims.generateFrameNumbers('zimni', {start: 12, end: 0 }),
+        frameRate: 10,
+        repeat:0
+    });
+    
+    this.anims.create({
+        key: 'zimnikill',
+        frames: this.anims.generateFrameNumbers('zimni', {start: 13, end: 26 }),
+        frameRate: 10,
+        repeat:0
+    });
   
     //this.add.image(400, 300, 'map_tilesw');
     let key = 'json_map';
     if(this.mapType == 'water')
         key = 'json_mapWater'
+    if(this.mapType == 'zimni')
+        key = 'json_mapLava'
     this.map = this.make.tilemap({ key: key });//json map 
     let tiles = this.map.addTilesetImage('map_tilesew','tiles');
 
     this.backgroundLayer = this.map.createLayer('background', tiles);
     this.collisionLayer = this.map.createLayer('collision', tiles, 0, 0).setActive(true).setVisible(false);
     this.waterLayer = this.map.createLayer('water', tiles, 0, 0).setActive(true).setVisible(false);
+    this.antarktidaLayer = this.map.createLayer('antarktida', tiles, 0, 0).setActive(true).setVisible(false);
     
     const { width, height } = this.scale;
     this.playButton = this.physics.add.sprite(width * 0.5, height * 0.7, 'krtek').setScale(4);
@@ -334,7 +359,11 @@ export default class WhacAMole extends Phaser.Scene
                 let y = Math.round((Math.floor(Math.random()*676))/32)*28+220;
                 if(this.collisionLayer?.getTileAtWorldXY(x, y))
                     return;
-                let type = this.waterLayer?.getTileAtWorldXY(x, y) ? 'potapec' : 'krtek'
+                let type = 'krtek'
+                if(this.waterLayer?.getTileAtWorldXY(x, y))
+                    type = 'potapec';
+                if(this.antarktidaLayer?.getTileAtWorldXY(x, y))
+                    type = 'zimni';
                 let enemy = this.physics.add.sprite(x, y, type);
                 enemy.setBounce(0.1);
                 let myEnemy = {enemy: enemy, dead: false, timer: setTimeout(()=>{this.reduceHealth(myEnemy)}, 3000), type: type};
