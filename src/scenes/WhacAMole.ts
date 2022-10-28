@@ -33,7 +33,7 @@ export default class WhacAMole extends Phaser.Scene
 
     fontSize: number;
     
-    playButton: Phaser.GameObjects.Image | null;
+    playButton: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | null;
     started: boolean;
     hold: number;
 
@@ -110,41 +110,7 @@ export default class WhacAMole extends Phaser.Scene
     this.font.L = this.letter('L', this.fontSize);
     this.font.S = this.letter('S', this.fontSize);
     this.font.T = this.letter('T', this.fontSize);
-    
-  
-    //this.add.image(400, 300, 'map_tilesw');
-    this.map = this.make.tilemap({ key: 'json_map' });//json map 
-    let tiles = this.map.addTilesetImage('map_tilesew','tiles');
 
-    this.backgroundLayer = this.map.createLayer('background', tiles);
-    
-    const { width, height } = this.scale;
-    this.playButton = this.add.image(width * 0.5, height * 0.6, 'glass-panel');
-    this.physics.add.overlap(this.playButton, this.backgroundLayer);    
-
-    this.hammer = this.physics.add.sprite(100, 450, 'hammer');
-    this.physics.add.overlap(this.hammer, this.backgroundLayer);  
-    
-    if(this.hammer && this.playButton)
-        this.physics.add.overlap(this.hammer, this.playButton, () => { 
-            this.hold--;
-            if(this.playButton != undefined)
-                this.playButton.alpha = Math.min(this.hold, 0);
-            if(this.hold<=0)
-                this.started = true;
-            }, ()=>{ !this.started });
-       
-    this.backgroundLayer.setCollisionBetween(1, 25);  
-    
-    this.text = this.add.text(100, 16, '', {
-        fontSize: '55',
-        fontFamily: 'fantasy',
-        align: 'center',
-    });
-    this.text.setOrigin(0.5);
-    this.text.setScrollFactor(0);    
-    this.updateText();
-    
     this.anims.create({
         key: 'up',
         frames: this.anims.generateFrameNumbers('krtek', {start: 0, end: 12 }),
@@ -164,6 +130,43 @@ export default class WhacAMole extends Phaser.Scene
         frameRate: 10,
         repeat:0
     });
+  
+    //this.add.image(400, 300, 'map_tilesw');
+    this.map = this.make.tilemap({ key: 'json_map' });//json map 
+    let tiles = this.map.addTilesetImage('map_tilesew','tiles');
+
+    this.backgroundLayer = this.map.createLayer('background', tiles);
+    
+    const { width, height } = this.scale;
+    this.playButton = this.physics.add.sprite(width * 0.5, height * 0.7, 'krtek').setScale(3);
+    this.playButton.anims.play('up', true);
+    this.physics.add.overlap(this.playButton, this.backgroundLayer);    
+
+    this.hammer = this.physics.add.sprite(100, 450, 'hammer');
+    this.physics.add.overlap(this.hammer, this.backgroundLayer);  
+    
+    if(this.hammer && this.playButton)
+        this.physics.add.overlap(this.hammer, this.playButton, () => { 
+            this.hold--;
+            this.playButton?.anims.setProgress(this.hold/100);
+            if(this.hold<=20)
+                this.hold = 0;
+                setTimeout(()=>{
+                    this.playButton?.destroy(true);
+                    this.started = true;
+                },1300);
+            });
+       
+    this.backgroundLayer.setCollisionBetween(1, 25);  
+    
+    this.text = this.add.text(100, 16, '', {
+        fontSize: '55',
+        fontFamily: 'fantasy',
+        align: 'center',
+    });
+    this.text.setOrigin(0.5);
+    this.text.setScrollFactor(0);    
+    this.updateText();
     
     // cursors = this.input.keyboard.createCursorKeys();  
 
