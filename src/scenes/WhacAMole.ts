@@ -136,9 +136,10 @@ export default class WhacAMole extends Phaser.Scene
     let tiles = this.map.addTilesetImage('map_tilesew','tiles');
 
     this.backgroundLayer = this.map.createLayer('background', tiles);
+    this.collisionLayer = this.map.createLayer('collision', tiles, 0, 0).setVisible(false).setActive(true).setVisible(false);
     
     const { width, height } = this.scale;
-    this.playButton = this.physics.add.sprite(width * 0.5, height * 0.7, 'krtek').setScale(3);
+    this.playButton = this.physics.add.sprite(width * 0.5, height * 0.7, 'krtek').setScale(4);
     this.playButton.anims.play('up', true);
     this.physics.add.overlap(this.playButton, this.backgroundLayer);    
 
@@ -284,9 +285,8 @@ export default class WhacAMole extends Phaser.Scene
             if(this.tick % 30 == 0 && Math.random() > 0.5 && this.enemies.length < 10) {
                 let x = Math.round((Math.floor(Math.random()*1408))/44)*32;
                 let y = Math.round((Math.floor(Math.random()*676))/32)*28+220;
-                if(this.collisionLayer)
-                    if(this.collisionLayer.getTileAtWorldXY(x, y))
-                        return;
+                if(this.collisionLayer?.getTileAtWorldXY(x, y))
+                    return;
                 let enemy = this.physics.add.sprite(x, y, 'krtek');
                 enemy.setBounce(0.1);
                 let myEnemy = {enemy: enemy, dead: false, timer: setTimeout(()=>{this.reduceHealth(myEnemy)}, 3000)};
@@ -350,13 +350,14 @@ export default class WhacAMole extends Phaser.Scene
     removeEnemy(enemy: Enemy, removeParam: number){
         let index = this.enemies.indexOf(enemy);
         this.enemies.splice(index, 1);
+        let curAnim = enemy.enemy.anims.getName();
+        let curAnimProgress = enemy.enemy.anims.getProgress();
         if(removeParam==1){
-            let curAnimProgress = enemy.enemy.anims.getProgress();
             enemy.enemy.anims.play('kill', true);
-            enemy.enemy.anims.setProgress(1 - curAnimProgress); 
+            enemy.enemy.anims.setProgress(curAnim == "up" ? 1 - curAnimProgress : curAnimProgress); 
             setTimeout(()=>{
                 enemy.enemy.destroy(true);
-            }, 1300);
+            }, curAnimProgress != 1 ? (curAnim == "up" ? 1300 * (1 - curAnimProgress) : 1300 * curAnimProgress) : 1300);
         }
         else if(removeParam==-1){
             enemy.enemy.destroy(true);
@@ -365,7 +366,7 @@ export default class WhacAMole extends Phaser.Scene
             enemy.enemy.anims.play('down', true);
             setTimeout(()=>{
                 enemy.enemy.destroy(true);
-            },1300);
+            }, 1300);
         }
     }
 
