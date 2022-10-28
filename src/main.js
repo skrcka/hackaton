@@ -1,6 +1,7 @@
 import Phaser from 'phaser'
 
 import WhacAMole from './scenes/WhacAMole'
+import MainMenu from './scenes/MainMenu'
 
 const config = {
 	type: Phaser.CANVAS,
@@ -18,7 +19,7 @@ const config = {
         }
     },
     debug: true,
-	scene: [WhacAMole]
+	scene: [MainMenu, WhacAMole]
 }
 
 export default new Phaser.Game(config)

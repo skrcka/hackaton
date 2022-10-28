@@ -75,23 +75,6 @@ export default class WhacAMole extends Phaser.Scene
 
 	preload()
     {
-        this.load.spritesheet('krtek', 'assets/Krtek_final.png',
-            { frameWidth: 64, frameHeight: 71} );
-        this.load.spritesheet('potapec', 'assets/potapec.png',
-            { frameWidth: 64, frameHeight: 71} );
-            
-        this.load.spritesheet('items', 'assets/items.png', { frameWidth: 32, frameHeight: 32 } ); 
-        this.load.spritesheet('hammer', 'assets/hammer.png', { frameWidth: 32, frameHeight: 32 } ); 
-        this.load.spritesheet('hammerAn', 'assets/Kladivo_fin.png', { frameWidth: 44, frameHeight: 44});
-
-        this.load.image('tiles', 'assets/map_tilesew.png');
-        this.load.tilemapTiledJSON('json_map', 'assets/json_map.json');
-        
-        this.load.audio('bgMusic','assets/song.mp3');
-        this.load.audio('damage','assets/kill.mp3');
-        this.load.audio('bonk','assets/bonk.mp3');
-        this.load.audio('healthMinus','assets/aughMinus.mp3');
-        this.load.audio('healthDeath','assets/aughDeath.mp3');
     }
 
     resize(width, height){
