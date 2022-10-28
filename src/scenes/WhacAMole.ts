@@ -17,6 +17,7 @@ export default class WhacAMole extends Phaser.Scene
 
     map: Phaser.Tilemaps.Tilemap | null;
     backgroundLayer: Phaser.Tilemaps.TilemapLayer | null;
+    collisionLayer: Phaser.Tilemaps.TilemapLayer | null;
 
     hammer: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | null;
 
@@ -41,6 +42,7 @@ export default class WhacAMole extends Phaser.Scene
 
         this.map = null;
         this.backgroundLayer=null;
+        this.collisionLayer=null;
 
         this.hammer=null;
 
@@ -95,6 +97,8 @@ export default class WhacAMole extends Phaser.Scene
     console.log(tiles);
 
     this.backgroundLayer = this.map.createLayer('background', tiles);
+    this.collisionLayer = this.map.createLayer('collision', tiles, 0, 0).setVisible(false).setActive(true).setVisible(false);
+    //this.collisionLayer.setCollisionByExclusion([ -1 ]);
     
     this.hammer = this.physics.add.sprite(100, 450, 'hammer');
     this.physics.add.overlap(this.hammer, this.backgroundLayer);    
@@ -177,8 +181,9 @@ export default class WhacAMole extends Phaser.Scene
                 let myEnemy = {enemy: enemy, dead: false, timer: setTimeout(()=>{this.reduceHealth(myEnemy)}, 3000)};
                 this.enemies.push(myEnemy);
                 enemy.anims.play('up', true);
-                if(this.backgroundLayer){
+                if(this.backgroundLayer && this.collisionLayer){
                     //this.physics.add.collider(enemy, this.collisionLayer);
+                    this.physics.add.overlap(enemy, this.collisionLayer, () => { this.removeEnemy(enemy, -1); });
                     this.physics.add.overlap(enemy, this.backgroundLayer);
                     if(this.hammer)
                         this.physics.add.overlap(this.hammer, enemy, () => { this.collisionHandlerEnemy(myEnemy) });
@@ -217,11 +222,14 @@ export default class WhacAMole extends Phaser.Scene
         let index = this.enemies.indexOf(enemy);
         console.log(index);
         this.enemies.splice(index, 1);
-        if(removeParam){
+        if(removeParam==1){
             enemy.enemy.anims.play('kill', true); 
             setTimeout(()=>{
                 enemy.enemy.destroy(true);
             }, 1300);
+        }
+        else if(removeParam==-1){
+            enemy.enemy.destroy(true);
         }
         else{
             enemy.enemy.anims.play('down', true);
