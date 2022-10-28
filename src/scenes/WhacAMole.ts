@@ -81,7 +81,6 @@ export default class WhacAMole extends Phaser.Scene
     init(data)
     {
         this.mapType=data.mapType;
-        this.music?.play();
     }
 
 	preload()
@@ -98,6 +97,7 @@ export default class WhacAMole extends Phaser.Scene
     this.resize(Math.min(window.innerWidth, window.outerWidth), Math.min(window.innerHeight, window.outerHeight));
     //AUDIO
     this.music = this.sound.add('bgMusic');
+    this.music?.play();
     this.music_damage = this.sound.add('damage');
     this.sound_bonk = this.sound.add('bonk');
     this.sound_healthMinus = this.sound.add('healthMinus');

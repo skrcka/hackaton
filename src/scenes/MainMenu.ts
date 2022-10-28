@@ -132,7 +132,7 @@ export default class Menu extends Phaser.Scene
         
         const { width, height } = this.scale;
         this.playButton1 = this.physics.add.sprite(width * 0.2, height * 0.7, 'krtek').setScale(4);
-        this.playButton2 = this.physics.add.sprite(width * 0.5, height * 0.7, 'potapec').setScale(4);
+        this.playButton2 = this.physics.add.sprite(width * 0.45, height * 0.7, 'potapec').setScale(4);
         this.playButton3 = this.physics.add.sprite(width * 0.7, height * 0.7, 'zimni').setScale(4);
 
         this.text = this.add.text(100, 16, '', {
@@ -141,7 +141,7 @@ export default class Menu extends Phaser.Scene
             align: 'center',
         });
 
-        this.text?.setText('Hold Diglet to start');
+        this.text?.setText('');
         this.text?.setColor('Brown');
         this.text?.setPosition(530, 340);
         this.text?.setFontFamily('Georgia, "Goudy Bookletter 1911", Times, serif');
@@ -155,30 +155,18 @@ export default class Menu extends Phaser.Scene
         
         if(this.hammer && this.playButton1)
             this.physics.add.overlap(this.hammer, this.playButton1, () => { 
-                this.hold1--;
-                this.playButton1?.anims.setProgress(Math.min(this.hold1/100,0));
-                if(this.hold1==20)
-                    this.changingScene = 'default';
-                    this.hold1 = 0;
-                }, ()=>!this.changingScene);
+                    this.scene.start('whacamole', {mapType: 'default'});
+                });
 
         if(this.hammer && this.playButton2)
             this.physics.add.overlap(this.hammer, this.playButton2, () => { 
-                this.hold2--;
-                this.playButton2?.anims.setProgress(Math.min(this.hold1/100,0));
-                if(this.hold2==20)
-                this.changingScene = 'water';
-                    this.hold2 = 0;
-                }, ()=>!this.changingScene);
+                    this.scene.start('whacamole', {mapType: 'water'});
+                });
 
             if(this.hammer && this.playButton3)
                 this.physics.add.overlap(this.hammer, this.playButton3, () => { 
-                    this.hold3--;
-                    this.playButton3?.anims.setProgress(Math.min(this.hold1/100,0));
-                    if(this.hold3==20)
-                        this.changingScene = 'zimni';
-                        this.hold3 = 0;
-                    }, ()=>!this.changingScene);
+                    this.scene.start('whacamole', {mapType: 'zimni'});
+                    });
         
         this.input.on('pointermove', (p) => { this.pointer_move(p); });
     }
@@ -191,16 +179,5 @@ export default class Menu extends Phaser.Scene
     }
 
     update() {
-        if(this.changingScene){
-            console.log('scene change');
-            let scene = this.changingScene;
-            setTimeout(()=>{
-                this.playButton1?.destroy(true);
-                this.playButton2?.destroy(true);
-                this.playButton3?.destroy(true);
-                this.scene.start('whacamole', {mapType: scene});
-            }, 1300);
-        this.changingScene = '';
-        }
     }
 }
