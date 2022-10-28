@@ -77,6 +77,7 @@ export default class WhacAMole extends Phaser.Scene
             
         this.load.spritesheet('items', 'assets/items.png', { frameWidth: 32, frameHeight: 32 } ); 
         this.load.spritesheet('hammer', 'assets/hammer.png', { frameWidth: 32, frameHeight: 32 } ); 
+        this.load.spritesheet('hammerAn', 'assets/Kladivo_fin.png', { frameWidth: 44, frameHeight: 44});
 
         this.load.image('tiles', 'assets/map_tilesew.png');
         this.load.tilemapTiledJSON('json_map', 'assets/json_map.json');
@@ -130,6 +131,12 @@ export default class WhacAMole extends Phaser.Scene
         frameRate: 10,
         repeat:0
     });
+    this.anims.create({
+        key: 'hammerBonk',
+        frames: this.anims.generateFrameNumbers('hammerAn', {start: 5, end: 12 }),
+        frameRate: 30,
+        repeat:0
+    });
   
     //this.add.image(400, 300, 'map_tilesw');
     this.map = this.make.tilemap({ key: 'json_map' });//json map 
@@ -142,7 +149,7 @@ export default class WhacAMole extends Phaser.Scene
     this.playButton.anims.play('up', true);
     this.physics.add.overlap(this.playButton, this.backgroundLayer);    
 
-    this.hammer = this.physics.add.sprite(100, 450, 'hammer');
+    this.hammer = this.physics.add.sprite(100, 450, 'hammerAn');
     this.physics.add.overlap(this.hammer, this.backgroundLayer);  
     
     if(this.hammer && this.playButton)
@@ -294,8 +301,9 @@ export default class WhacAMole extends Phaser.Scene
                 enemy.anims.play('up', true);
                 if(this.backgroundLayer){
                     this.physics.add.overlap(enemy, this.backgroundLayer);
-                    if(this.hammer)
+                    if(this.hammer){
                         this.physics.add.overlap(this.hammer, enemy, () => { this.collisionHandlerEnemy(myEnemy) });
+                    }
                 }
             }
         }
@@ -370,9 +378,11 @@ export default class WhacAMole extends Phaser.Scene
     }
 
     collisionHandlerEnemy(enemy: Enemy) {
+        
         if(enemy.dead)
             return;
         enemy.dead = true;
+        this.hammer?.anims.play('hammerBonk', true);
         this.sound_bonk?.play();
         this.removeEnemy(enemy, 1);
     }
