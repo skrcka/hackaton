@@ -14,6 +14,8 @@ export default class Menu extends Phaser.Scene
     hold2: number;
     hold3: number;
 
+    changingScene: string;
+
 	constructor()
 	{
 		super('menu');
@@ -26,6 +28,8 @@ export default class Menu extends Phaser.Scene
         this.hold1=100;
         this.hold2=100;
         this.hold3=100;
+
+        this.changingScene = '';
 	}
 
 	preload()
@@ -37,8 +41,6 @@ export default class Menu extends Phaser.Scene
         this.load.spritesheet('zimni', 'assets/zimni.png',
             { frameWidth: 64, frameHeight: 71} );
             
-        this.load.spritesheet('items', 'assets/items.png', { frameWidth: 32, frameHeight: 32 } ); 
-        this.load.spritesheet('hammer', 'assets/hammer.png', { frameWidth: 32, frameHeight: 32 } ); 
         this.load.spritesheet('hammerAn', 'assets/Kladivo_fin.png', { frameWidth: 44, frameHeight: 44});
 
         this.load.image('tiles', 'assets/map_tilesew.png');
@@ -154,38 +156,29 @@ export default class Menu extends Phaser.Scene
         if(this.hammer && this.playButton1)
             this.physics.add.overlap(this.hammer, this.playButton1, () => { 
                 this.hold1--;
-                this.playButton1?.anims.setProgress(this.hold1/100);
-                if(this.hold1<=20)
+                this.playButton1?.anims.setProgress(Math.min(this.hold1/100,0));
+                if(this.hold1==20)
+                    this.changingScene = 'default';
                     this.hold1 = 0;
-                    setTimeout(()=>{
-                        this.playButton1?.destroy(true);
-                        this.scene.start('whacamole', {mapType: 'default'}); // , {maptype: 'default'}
-                    },1300);
-                });
+                }, ()=>!this.changingScene);
 
         if(this.hammer && this.playButton2)
             this.physics.add.overlap(this.hammer, this.playButton2, () => { 
                 this.hold2--;
-                this.playButton2?.anims.setProgress(this.hold2/100);
-                if(this.hold2<=20)
+                this.playButton2?.anims.setProgress(Math.min(this.hold1/100,0));
+                if(this.hold2==20)
+                this.changingScene = 'water';
                     this.hold2 = 0;
-                    setTimeout(()=>{
-                        this.playButton2?.destroy(true);
-                        this.scene.start('whacamole', {mapType: 'water'});
-                    },1300);
-                });
+                }, ()=>!this.changingScene);
 
             if(this.hammer && this.playButton3)
                 this.physics.add.overlap(this.hammer, this.playButton3, () => { 
                     this.hold3--;
-                    this.playButton3?.anims.setProgress(this.hold3/100);
-                    if(this.hold3<=20)
+                    this.playButton3?.anims.setProgress(Math.min(this.hold1/100,0));
+                    if(this.hold3==20)
+                        this.changingScene = 'zimni';
                         this.hold3 = 0;
-                        setTimeout(()=>{
-                            this.playButton3?.destroy(true);
-                            this.scene.start('whacamole', {mapType: 'zimni'});
-                        },1300);
-                    });
+                    }, ()=>!this.changingScene);
         
         this.input.on('pointermove', (p) => { this.pointer_move(p); });
     }
@@ -197,5 +190,17 @@ export default class Menu extends Phaser.Scene
         this.hammer.y = pointer.y;
     }
 
-   update(){}
+    update() {
+        if(this.changingScene){
+            console.log('scene change');
+            let scene = this.changingScene;
+            setTimeout(()=>{
+                this.playButton1?.destroy(true);
+                this.playButton2?.destroy(true);
+                this.playButton3?.destroy(true);
+                this.scene.start('whacamole', {mapType: scene});
+            }, 1300);
+        this.changingScene = '';
+        }
+    }
 }

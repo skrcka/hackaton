@@ -4,7 +4,7 @@ import WhacAMole from './scenes/WhacAMole'
 import MainMenu from './scenes/MainMenu'
 
 const config = {
-	type: Phaser.CANVAS,
+	type: Phaser.AUTO,
     width: 1408,
     height: 896,
     parent: 'parent',
