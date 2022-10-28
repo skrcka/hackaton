@@ -140,6 +140,19 @@ export default class WhacAMole extends Phaser.Scene
     
     const { width, height } = this.scale;
     this.playButton = this.physics.add.sprite(width * 0.5, height * 0.7, 'krtek').setScale(4);
+
+    this.text = this.add.text(100, 16, '', {
+        fontSize: '55',
+        fontFamily: 'fantasy',
+        align: 'center',
+    });
+
+    this.text?.setText('Hold Diglet to start');
+    this.text?.setColor('Brown');
+    this.text?.setPosition(530, 340);
+    this.text?.setFontFamily('Georgia, "Goudy Bookletter 1911", Times, serif');
+    this.text?.setFontSize(65);
+
     this.playButton.anims.play('up', true);
     this.physics.add.overlap(this.playButton, this.backgroundLayer);    
 
@@ -160,11 +173,6 @@ export default class WhacAMole extends Phaser.Scene
        
     this.backgroundLayer.setCollisionBetween(1, 25);  
     
-    this.text = this.add.text(100, 16, '', {
-        fontSize: '55',
-        fontFamily: 'fantasy',
-        align: 'center',
-    });
     this.text.setOrigin(0.5);
     this.text.setScrollFactor(0);    
     this.updateText();
@@ -329,7 +337,7 @@ export default class WhacAMole extends Phaser.Scene
             this.text?.setPosition(1330, 240);
             this.text?.setFontFamily('Georgia, "Goudy Bookletter 1911", Times, serif');
             this.text?.setFontSize(15);
-            setTimeout(()=>{this.scene.restart();}, 10000);
+            //setTimeout(()=>{this.scene.restart();}, 10000);
         }
     }
 
