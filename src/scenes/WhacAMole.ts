@@ -181,7 +181,7 @@ export default class WhacAMole extends Phaser.Scene
     });
 
     this.text?.setText('Hold Diglet to start');
-    this.text?.setColor('Brown');
+    this.text?.setColor('Black');
     this.text?.setPosition(530, 340);
     this.text?.setFontFamily('Georgia, "Goudy Bookletter 1911", Times, serif');
     this.text?.setFontSize(65);
@@ -223,10 +223,22 @@ export default class WhacAMole extends Phaser.Scene
 
     updateText()
     {
-        this.text?.setPosition(1265, 50);
-        this.text?.setText(`Počet životů ${this.curHealth}`);
-        this.text?.setColor('black');
-        this.text?.setFontFamily('Georgia, "Goudy Bookletter 1911", Times, serif');
+        this.text?.setPosition(1295, 50);
+        if(this.curHealth == 4)
+        {
+            this.text?.setText('♥♥♥')
+        }
+        else if(this.curHealth == 3)
+        {
+            this.text?.setText('♥♥')
+        }
+        else if (this.curHealth == 2)
+        {
+            this.text?.setText('♥')
+        }
+        else
+        return;
+        this.text?.setColor('red');
         this.text?.setFontSize(40);
     }
 
