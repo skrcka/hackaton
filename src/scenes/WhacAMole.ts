@@ -6,11 +6,6 @@ interface Enemy  {
     timer: number
 }
 
-interface Letter {
-    letter: string,
-    font: Array<Array<number>>
-}
-
 
 export default class WhacAMole extends Phaser.Scene
 {
@@ -38,9 +33,13 @@ export default class WhacAMole extends Phaser.Scene
 
     fontSize: number;
     
+    playButton: Phaser.GameObjects.Image | null;
+    started: boolean;
+    hold: number;
+
 	constructor()
 	{
-		super('hello-world');
+		super('whacamole');
 
         this.music=null;
         this.music_damage=null;
@@ -66,6 +65,9 @@ export default class WhacAMole extends Phaser.Scene
         this.font = {};
 
         this.fontSize = 200;
+        this.playButton=null;
+        this.started = false;
+        this.hold=100;
 	}
 
 	preload()
@@ -115,11 +117,22 @@ export default class WhacAMole extends Phaser.Scene
     let tiles = this.map.addTilesetImage('map_tilesew','tiles');
 
     this.backgroundLayer = this.map.createLayer('background', tiles);
-    this.collisionLayer = this.map.createLayer('collision', tiles, 0, 0).setVisible(false).setActive(true).setVisible(false);
-    //this.collisionLayer.setCollisionByExclusion([ -1 ]);
     
+    const { width, height } = this.scale;
+    this.playButton = this.add.image(width * 0.5, height * 0.6, 'glass-panel');
+    this.physics.add.overlap(this.playButton, this.backgroundLayer);    
+
     this.hammer = this.physics.add.sprite(100, 450, 'hammer');
-    this.physics.add.overlap(this.hammer, this.backgroundLayer);    
+    this.physics.add.overlap(this.hammer, this.backgroundLayer);  
+    
+    if(this.hammer && this.playButton)
+        this.physics.add.overlap(this.hammer, this.playButton, () => { 
+            this.hold--;
+            if(this.playButton != undefined)
+                this.playButton.alpha = Math.min(this.hold, 0);
+            if(this.hold<=0)
+                this.started = true;
+            }, ()=>{ !this.started });
        
     this.backgroundLayer.setCollisionBetween(1, 25);  
     
@@ -132,12 +145,6 @@ export default class WhacAMole extends Phaser.Scene
     this.text.setScrollFactor(0);    
     this.updateText();
     
-    this.anims.create({
-        key: 'alive',
-        frames: this.anims.generateFrameNumbers('robot', { start: 8, end: 12 }),
-        frameRate: 80,
-        repeat: -1
-    });
     this.anims.create({
         key: 'up',
         frames: this.anims.generateFrameNumbers('krtek', {start: 0, end: 12 }),
@@ -265,6 +272,8 @@ export default class WhacAMole extends Phaser.Scene
     
 
     update() {
+        if(!this.started)
+            return;
         this.tick++;
         if(this.curHealth > 0){
             if(this.tick % 30 == 0 && Math.random() > 0.5 && this.enemies.length < 10) {
@@ -311,6 +320,7 @@ export default class WhacAMole extends Phaser.Scene
         this.updateText();
         if(this.curHealth <= 0){
             this.text?.setText('you dieded axaxa');
+            setTimeout(()=>{this.scene.restart();}, 10000);
         }
     }
 
