@@ -68,8 +68,8 @@ export default class WhacAMole extends Phaser.Scene
 
 	preload()
     {
-        this.load.spritesheet('krtek', 'assets/Krtek_rescale.png',
-            { frameWidth: 64, frameHeight: 70} );
+        this.load.spritesheet('krtek', 'assets/Krtek_final.png',
+            { frameWidth: 64, frameHeight: 71} );
             
         this.load.spritesheet('items', 'assets/items.png', { frameWidth: 32, frameHeight: 32 } ); 
         this.load.spritesheet('hammer', 'assets/hammer.png', { frameWidth: 32, frameHeight: 32 } ); 
@@ -288,20 +288,20 @@ export default class WhacAMole extends Phaser.Scene
             
             you.forEach((element, index) => {
                 let r = Math.floor(Math.random()*this.font[element].length);
-                let x = this.font[element][r][0] + index*(this.fontSize + 20) + 100;
-                let y = this.font[element][r][1] + 250;
+                let x = this.font[element][r][0] + index*(this.fontSize + 20) + 75;
+                let y = this.font[element][r][1] + 280;
                 let enemy = this.physics.add.sprite(x, y, 'krtek');
                 enemy.anims.play('up', true);
             });
 
             lost.forEach((element, index) => {
                 let r = Math.floor(Math.random()*this.font[element].length);
-                let x = this.font[element][r][0] + index*(this.fontSize +20) + 600;
-                let y = this.font[element][r][1] + 540;
+                let x = this.font[element][r][0] + index*(this.fontSize +20) + 540;
+                let y = this.font[element][r][1] + 620;
                 let enemy = this.physics.add.sprite(x, y, 'krtek');
                 enemy.anims.play('up', true);
             });
-
+            
 
         }
         this.updateText();
