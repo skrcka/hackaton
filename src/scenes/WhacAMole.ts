@@ -181,9 +181,11 @@ export default class WhacAMole extends Phaser.Scene
 
     updateText()
     {
-        this.text?.setPosition(100, this.text.height);
+        this.text?.setPosition(1265, 50);
         this.text?.setText(`Počet životů ${this.curHealth}`);
-        this.text?.setColor('white');
+        this.text?.setColor('black');
+        this.text?.setFontFamily('Georgia, "Goudy Bookletter 1911", Times, serif');
+        this.text?.setFontSize(40);
     }
 
     pointer_move(pointer) {
@@ -322,7 +324,11 @@ export default class WhacAMole extends Phaser.Scene
         }
         this.updateText();
         if(this.curHealth <= 0){
-            this.text?.setText('you dieded axaxa');
+            this.text?.setText('Sinep Studio');
+            this.text?.setColor('Gold');
+            this.text?.setPosition(1330, 240);
+            this.text?.setFontFamily('Georgia, "Goudy Bookletter 1911", Times, serif');
+            this.text?.setFontSize(15);
             setTimeout(()=>{this.scene.restart();}, 10000);
         }
     }
