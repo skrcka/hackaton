@@ -3,11 +3,14 @@ import Phaser from 'phaser'
 import WhacAMole from './scenes/WhacAMole'
 
 const config = {
-	type: Phaser.AUTO,
-    parent: 'phaser-app',
+	type: Phaser.CANVAS,
+    width: 1408,
+    height: 768,
+    parent: 'parent',
     scale: {
-        mode: Phaser.Scale.FIT,
+        mode: Phaser.Scale.CENTER_BOTH,
     },
+    autoCenter: Phaser.Scale.CENTER_BOTH,
     physics: {
         default: 'arcade',
         arcade: {
