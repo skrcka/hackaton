@@ -397,7 +397,7 @@ export default class WhacAMole extends Phaser.Scene
         let curAnimProgress = enemy.enemy.anims.getProgress();
         if(removeParam==1){
             enemy.enemy.anims.play(`${enemy.type}kill`, true);
-            enemy.enemy.anims.setProgress(curAnim == "up" ? 1 - curAnimProgress : curAnimProgress); 
+            enemy.enemy.anims.setProgress(curAnimProgress != 1 ? (curAnim == "up" ? 1 - curAnimProgress : curAnimProgress) : 0); 
             setTimeout(()=>{
                 enemy.enemy.destroy(true);
             }, curAnimProgress != 1 ? (curAnim == `${enemy.type}up` ? 1300 * (1 - curAnimProgress) : 1300 * curAnimProgress) : 1300);
