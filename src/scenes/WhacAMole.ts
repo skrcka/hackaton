@@ -59,7 +59,7 @@ export default class WhacAMole extends Phaser.Scene
 
         this.text=null;
 
-        this.curHealth=0;
+        this.curHealth=4;
 
         this.font = {};
 

@@ -5,12 +5,11 @@ import WhacAMole from './scenes/WhacAMole'
 const config = {
 	type: Phaser.CANVAS,
     width: 1408,
-    height: 768,
+    height: 896,
     parent: 'parent',
     scale: {
         mode: Phaser.Scale.CENTER_BOTH,
     },
-    autoCenter: Phaser.Scale.CENTER_BOTH,
     physics: {
         default: 'arcade',
         arcade: {
