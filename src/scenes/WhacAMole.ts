@@ -3,7 +3,8 @@ import Phaser from 'phaser'
 interface Enemy  {
     enemy: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody,
     dead: boolean,
-    timer: number
+    timer: number,
+    type: string
 }
 
 
@@ -18,6 +19,7 @@ export default class WhacAMole extends Phaser.Scene
     map: Phaser.Tilemaps.Tilemap | null;
     backgroundLayer: Phaser.Tilemaps.TilemapLayer | null;
     collisionLayer: Phaser.Tilemaps.TilemapLayer | null;
+    waterLayer: Phaser.Tilemaps.TilemapLayer | null;
 
     hammer: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | null;
 
@@ -51,6 +53,7 @@ export default class WhacAMole extends Phaser.Scene
         this.map = null;
         this.backgroundLayer=null;
         this.collisionLayer=null;
+        this.waterLayer=null;
 
         this.hammer=null;
 
@@ -73,6 +76,8 @@ export default class WhacAMole extends Phaser.Scene
 	preload()
     {
         this.load.spritesheet('krtek', 'assets/Krtek_final.png',
+            { frameWidth: 64, frameHeight: 71} );
+        this.load.spritesheet('potapec', 'assets/potapec.png',
             { frameWidth: 64, frameHeight: 71} );
             
         this.load.spritesheet('items', 'assets/items.png', { frameWidth: 32, frameHeight: 32 } ); 
@@ -112,21 +117,41 @@ export default class WhacAMole extends Phaser.Scene
     this.font.T = this.letter('T', this.fontSize);
 
     this.anims.create({
-        key: 'up',
+        key: 'krtekup',
         frames: this.anims.generateFrameNumbers('krtek', {start: 0, end: 12 }),
         frameRate: 10,
         repeat:0
     });
     this.anims.create({
-        key: 'down',
+        key: 'krtekdown',
         frames: this.anims.generateFrameNumbers('krtek', {start: 12, end: 0 }),
         frameRate: 10,
         repeat:0
     });
     
     this.anims.create({
-        key: 'kill',
+        key: 'krtekkill',
         frames: this.anims.generateFrameNumbers('krtek', {start: 13, end: 26 }),
+        frameRate: 10,
+        repeat:0
+    });
+
+    this.anims.create({
+        key: 'potapecup',
+        frames: this.anims.generateFrameNumbers('potapec', {start: 0, end: 12 }),
+        frameRate: 10,
+        repeat:0
+    });
+    this.anims.create({
+        key: 'potapecdown',
+        frames: this.anims.generateFrameNumbers('potapec', {start: 12, end: 0 }),
+        frameRate: 10,
+        repeat:0
+    });
+    
+    this.anims.create({
+        key: 'potapeckill',
+        frames: this.anims.generateFrameNumbers('potapec', {start: 13, end: 26 }),
         frameRate: 10,
         repeat:0
     });
@@ -136,7 +161,8 @@ export default class WhacAMole extends Phaser.Scene
     let tiles = this.map.addTilesetImage('map_tilesew','tiles');
 
     this.backgroundLayer = this.map.createLayer('background', tiles);
-    this.collisionLayer = this.map.createLayer('collision', tiles, 0, 0).setVisible(false).setActive(true).setVisible(false);
+    this.collisionLayer = this.map.createLayer('collision', tiles, 0, 0).setActive(true).setVisible(false);
+    this.waterLayer = this.map.createLayer('water', tiles, 0, 0).setActive(true).setVisible(false);
     
     const { width, height } = this.scale;
     this.playButton = this.physics.add.sprite(width * 0.5, height * 0.7, 'krtek').setScale(4);
@@ -153,7 +179,7 @@ export default class WhacAMole extends Phaser.Scene
     this.text?.setFontFamily('Georgia, "Goudy Bookletter 1911", Times, serif');
     this.text?.setFontSize(65);
 
-    this.playButton.anims.play('up', true);
+    this.playButton.anims.play('krtekup', true);
     this.physics.add.overlap(this.playButton, this.backgroundLayer);    
 
     this.hammer = this.physics.add.sprite(100, 450, 'hammer');
@@ -295,11 +321,12 @@ export default class WhacAMole extends Phaser.Scene
                 let y = Math.round((Math.floor(Math.random()*676))/32)*28+220;
                 if(this.collisionLayer?.getTileAtWorldXY(x, y))
                     return;
-                let enemy = this.physics.add.sprite(x, y, 'krtek');
+                let type = this.waterLayer?.getTileAtWorldXY(x, y) ? 'potapec' : 'krtek'
+                let enemy = this.physics.add.sprite(x, y, type);
                 enemy.setBounce(0.1);
-                let myEnemy = {enemy: enemy, dead: false, timer: setTimeout(()=>{this.reduceHealth(myEnemy)}, 3000)};
+                let myEnemy = {enemy: enemy, dead: false, timer: setTimeout(()=>{this.reduceHealth(myEnemy)}, 3000), type: type};
                 this.enemies.push(myEnemy);
-                enemy.anims.play('up', true);
+                enemy.anims.play(`${myEnemy.type}up`, true);
                 if(this.backgroundLayer){
                     this.physics.add.overlap(enemy, this.backgroundLayer);
                     if(this.hammer)
@@ -317,7 +344,7 @@ export default class WhacAMole extends Phaser.Scene
                 let x = this.font[element][r][0] + index*(this.fontSize + 20) + 75;
                 let y = this.font[element][r][1] + 280;
                 let enemy = this.physics.add.sprite(x, y, 'krtek');
-                enemy.anims.play('up', true);
+                enemy.anims.play('krtekup', true);
             });
 
             lost.forEach((element, index) => {
@@ -325,7 +352,7 @@ export default class WhacAMole extends Phaser.Scene
                 let x = this.font[element][r][0] + index*(this.fontSize +20) + 540;
                 let y = this.font[element][r][1] + 620;
                 let enemy = this.physics.add.sprite(x, y, 'krtek');
-                enemy.anims.play('up', true);
+                enemy.anims.play('krtekup', true);
             });
             
 
@@ -361,17 +388,17 @@ export default class WhacAMole extends Phaser.Scene
         let curAnim = enemy.enemy.anims.getName();
         let curAnimProgress = enemy.enemy.anims.getProgress();
         if(removeParam==1){
-            enemy.enemy.anims.play('kill', true);
+            enemy.enemy.anims.play(`${enemy.type}kill`, true);
             enemy.enemy.anims.setProgress(curAnim == "up" ? 1 - curAnimProgress : curAnimProgress); 
             setTimeout(()=>{
                 enemy.enemy.destroy(true);
-            }, curAnimProgress != 1 ? (curAnim == "up" ? 1300 * (1 - curAnimProgress) : 1300 * curAnimProgress) : 1300);
+            }, curAnimProgress != 1 ? (curAnim == `${enemy.type}up` ? 1300 * (1 - curAnimProgress) : 1300 * curAnimProgress) : 1300);
         }
         else if(removeParam==-1){
             enemy.enemy.destroy(true);
         }
         else{
-            enemy.enemy.anims.play('down', true);
+            enemy.enemy.anims.play(`${enemy.type}down`, true);
             setTimeout(()=>{
                 enemy.enemy.destroy(true);
             }, 1300);
