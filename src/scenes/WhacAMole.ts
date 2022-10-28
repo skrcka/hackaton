@@ -6,6 +6,11 @@ interface Enemy  {
     timer: number
 }
 
+interface Letter {
+    letter: string,
+    font: Array<Array<number>>
+}
+
 
 export default class WhacAMole extends Phaser.Scene
 {
@@ -28,6 +33,10 @@ export default class WhacAMole extends Phaser.Scene
     text: Phaser.GameObjects.Text | null;
 
     curHealth: number;
+
+    font: {[letter: string]: Array<Array<number>>}
+
+    fontSize: number;
     
 	constructor()
 	{
@@ -53,6 +62,10 @@ export default class WhacAMole extends Phaser.Scene
         this.text=null;
 
         this.curHealth=4;
+
+        this.font = {};
+
+        this.fontSize = 200;
 	}
 
 	preload()
@@ -89,7 +102,13 @@ export default class WhacAMole extends Phaser.Scene
     this.sound_healthDeath = this.sound.add('healthDeath');
 
     this.music.play();
-
+    this.font.Y = this.letter('Y', this.fontSize);
+    this.font.O = this.letter('O', this.fontSize);
+    this.font.U = this.letter('U', this.fontSize);
+    this.font.L = this.letter('L', this.fontSize);
+    this.font.S = this.letter('S', this.fontSize);
+    this.font.T = this.letter('T', this.fontSize);
+    
   
     //this.add.image(400, 300, 'map_tilesw');
     this.map = this.make.tilemap({ key: 'json_map' });//json map 
@@ -165,9 +184,86 @@ export default class WhacAMole extends Phaser.Scene
         this.hammer.y = pointer.y;
     }
 
-    //MATEMATIKA
-    //letterY(start, end){
-    //}
+    
+    letter(char:string,size:number): Array<Array<number>> {
+        let sizeX = size*0.66;
+        let y;
+        let tmp;
+        let arrayLet:Array<Array<number>> = [];
+        switch(char){
+            case 'Y':
+                for(let i = 0; i< sizeX;i++){
+                    y = i*1.33;
+                    if(i<sizeX/2){
+                        arrayLet.push([i,y]);
+                    }
+                    else
+                    {
+                        tmp = y - size/2.33;
+                        y = size/2.33 - tmp;
+                        arrayLet.push([i,y]);
+                    }
+                }
+                for(let i = size/2; i<size; i++)
+                {
+                    arrayLet.push([sizeX/2,i]);
+                }
+                break;
+            case 'O':
+                for(let i = 0; i<sizeX;i++){
+                    arrayLet.push([i,0]);
+                    arrayLet.push([i,size]);
+                }
+                for(let i = 0; i<size;i++){
+                    arrayLet.push([0,i]);
+                    arrayLet.push([sizeX,i]);
+                }
+                break;
+            case 'U':
+                for(let i = 0; i<sizeX;i++){
+                    arrayLet.push([i,size]);
+                }
+                for(let i = 0; i<size;i++){
+                    arrayLet.push([0, i]);
+                    arrayLet.push([sizeX, i]);
+                }
+                break;
+            case 'L':
+                for(let i = 0; i<sizeX;i++){
+                    arrayLet.push([i, size]);
+                }
+                for(let i = 0; i<size; i++){
+                    arrayLet.push([0,i]);
+                }
+                break;
+            case 'S':
+                for(let i = 0; i<sizeX; i++){
+                    arrayLet.push([i,0]);
+                    arrayLet.push([i,size]);
+                    arrayLet.push([i, size/2]);
+                }
+                for(let i = 0; i<size/2;i++){
+                    arrayLet.push([0,i]);
+                    arrayLet.push([sizeX,size/2+i]);
+                }
+
+                break;
+            case 'T':
+                for(let i = 0; i < sizeX; i++){
+                    arrayLet.push([i, 0]);
+                }
+                for(let i = 0; i< size; i++){
+                    arrayLet.push([sizeX/2, i]);
+                }
+                break;
+
+
+        }
+        return arrayLet;
+    }
+
+    
+    
 
     update() {
         this.tick++;
@@ -190,13 +286,28 @@ export default class WhacAMole extends Phaser.Scene
                 }
             }
         }
-        else if(this.tick % 4 == 0)
+        else if(this.tick % 10 == 0)
         {
+            let you = ["Y","O","U"];
+            let lost = ["L", "O", "S", "T"];
             
-            let x = Math.round((Math.floor(Math.random()*1005))/31)*31;
-            let y = Math.round((Math.floor(Math.random()*640))/31)*24+220;
-            let enemy = this.physics.add.sprite(x, y, 'krtek');
-            enemy.anims.play('up', true);
+            you.forEach((element, index) => {
+                let r = Math.floor(Math.random()*this.font[element].length);
+                let x = this.font[element][r][0] + index*(this.fontSize + 20) + 100;
+                let y = this.font[element][r][1] + 250;
+                let enemy = this.physics.add.sprite(x, y, 'krtek');
+                enemy.anims.play('up', true);
+            });
+
+            lost.forEach((element, index) => {
+                let r = Math.floor(Math.random()*this.font[element].length);
+                let x = this.font[element][r][0] + index*(this.fontSize +20) + 600;
+                let y = this.font[element][r][1] + 540;
+                let enemy = this.physics.add.sprite(x, y, 'krtek');
+                enemy.anims.play('up', true);
+            });
+
+
         }
         this.updateText();
         if(this.curHealth <= 0){
