@@ -355,7 +355,7 @@ export default class WhacAMole extends Phaser.Scene
         this.tick++;
         if(this.curHealth > 0){
             if(this.tick % 30 == 0 && Math.random() > 0.5 && this.enemies.length < 10) {
-                let x = Math.round((Math.floor(Math.random()*1408))/44)*32;
+                let x = Math.round((Math.floor(Math.random()*1408))/44)*44;
                 let y = Math.round((Math.floor(Math.random()*676))/32)*28+220;
                 if(this.collisionLayer?.getTileAtWorldXY(x, y))
                     return;
